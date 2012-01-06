@@ -1,0 +1,2 @@
+@PREFIX@/include/libavcodec*
+@PREFIX@/lib/pkgconfig/libavcodec*

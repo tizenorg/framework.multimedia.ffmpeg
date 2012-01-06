@@ -1,0 +1,8 @@
+ffmpeg (0.8.5) unstable; urgency=low
+
+  * Initial Release.
+  * Git : unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Wed, 07 Dec 2011 12:22:56 +0900
+

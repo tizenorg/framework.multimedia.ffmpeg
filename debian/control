@@ -1,0 +1,54 @@
+Source: ffmpeg
+Section: libs
+Priority: extra
+Maintainer: Haejeong Kim <backto.kim@samsung.com>
+Build-Depends: debhelper (>= 5), autotools-dev
+Standards-Version: 3.7.2
+
+Package: libavutil
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libavutil library
+
+Package: libavutil-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavutil (= ${Source-Version})
+Description: development files for libavutil
+
+Package: libavcodec
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libavcodec library
+
+Package: libavcodec-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavcodec (= ${Source-Version})
+Description: development files for libavcodec
+
+Package: libavformat
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libavformat library
+
+Package: libavformat-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavformat (= ${Source-Version})
+Description: development files for libavformat
+
+Package: libswscale
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libswscale library
+
+Package: libswscale-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libswscale (= ${Source-Version})
+Description: development files for libswscale

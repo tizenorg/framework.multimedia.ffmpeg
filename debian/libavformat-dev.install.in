@@ -1,0 +1,2 @@
+@PREFIX@/include/libavformat*
+@PREFIX@/lib/pkgconfig/libavformat*
