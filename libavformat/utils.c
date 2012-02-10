@@ -2261,11 +2261,13 @@ int av_find_stream_info(AVFormatContext *ic)
     for(i=0;i<ic->nb_streams;i++) {
         AVCodec *codec;
         st = ic->streams[i];
+#if 0	/*fix bug. m4a(aac) file's samperate,channel, frame_size is 0*/
         if (st->codec->codec_id == CODEC_ID_AAC) {
             st->codec->sample_rate = 0;
             st->codec->frame_size = 0;
             st->codec->channels = 0;
         }
+#endif
         if (st->codec->codec_type == AVMEDIA_TYPE_VIDEO ||
             st->codec->codec_type == AVMEDIA_TYPE_SUBTITLE) {
 /*            if(!st->time_base.num)
@@ -2360,6 +2362,12 @@ int av_find_stream_info(AVFormatContext *ic)
         /* NOTE: a new stream can be added there if no header in file
            (AVFMTCTX_NOHEADER) */
         ret = av_read_frame_internal(ic, &pkt1);
+
+	/*fix bug.
+	this function return error for some m4a(aac) and ogg file's. so, break here*/
+	if(st->codec->codec_id == CODEC_ID_AAC || st->codec->codec_id == CODEC_ID_VORBIS)
+		break;
+
         if (ret < 0 && ret != AVERROR(EAGAIN)) {
             /* EOF or error */
             ret = -1; /* we could not have all the codec parameters before EOF */

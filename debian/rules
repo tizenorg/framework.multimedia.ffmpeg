@@ -27,6 +27,9 @@ CONFIGURE_OPTIONS = --disable-static    --enable-shared   --disable-postproc \
 	--disable-mmx       --disable-zlib    --disable-network \
 	--disable-ffserver  --disable-ffplay  --disable-ffmpeg  \
 	--disable-avfilter  --disable-avdevice \
+	--disable-bsfs	    --disable-filters \
+	--disable-protocols \
+	--enable-protocol=file \
 	--disable-encoders \
 	--disable-muxers \
 	--disable-parsers \
@@ -46,6 +49,11 @@ CONFIGURE_OPTIONS = --disable-static    --enable-shared   --disable-postproc \
 	--enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
 	--enable-decoder=vc1 \
 	--enable-decoder=h263i  --enable-decoder=theora	 \
+	--enable-encoder=h263   --enable-encoder=h263p	--enable-encoder=mpeg4	 \
+	--enable-decoder=bmp  --enable-encoder=bmp	 \
+	--enable-decoder=tiff \
+	--enable-decoder=mp3  --enable-decoder=amrnb	\
+	--enable-encoder=aac  --enable-decoder=aac 	\
 	--enable-swscale	--disable-yasm
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
