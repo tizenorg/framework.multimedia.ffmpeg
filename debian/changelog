@@ -1,3 +1,40 @@
+ffmpeg (0.8.5-4) unstable; urgency=low
+
+  * bug fix. ffmpeg can't extract year (WM/Year) of wma format.
+  * Git : unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-4
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Fri, 03 Feb 2012 10:01:52 +0900
+
+ffmpeg (0.8.5-3) unstable; urgency=low
+
+  * disable unused options : filter, bsf, protocol
+  * Git : unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-3
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Thu, 05 Jan 2012 10:07:01 +0900
+
+ffmpeg (0.8.5-2) unstable; urgency=low
+
+  * enable some codecs
+  * bmp : enc/dec, tif : dec
+  * mp3/amrnb/aac : dec
+  * aac, h263, h263p, mpeg4 : enc
+  * Git : unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-2
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Wed, 04 Jan 2012 11:12:54 +0900
+
+ffmpeg (0.8.5-1) unstable; urgency=low
+
+  * bug fix.
+  * 1. some m4a(aac) file's info is 0.
+  * 2. some m4a(aac) and ogg file's find stream info fail.
+  * Git : unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-1
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Tue, 03 Jan 2012 15:18:04 +0900
+
 ffmpeg (0.8.5) unstable; urgency=low
 
   * Initial Release.
