@@ -1,10 +1,10 @@
 Name:       ffmpeg
 Summary:    AV codec lib
-Version:    0.8.5
-Release:    2.37
+Version: 0.8.5
+Release:    1
 Group:      TO_BE/FILLED_IN
-License:    GPLv2
-Source0:    ffmpeg-%{version}.tar.gz
+License:    LGPLv2
+Source0:    %{name}-%{version}.tar.gz
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -13,85 +13,111 @@ Requires(postun): /sbin/ldconfig
 AV codec library
 
 
-%package -n libswscale-devel
-Summary:    AV codec lib (devel)
-Group:      Development/Libraries
+%package -n libavcodec
+Summary:    AV codec lib
+Group:      TO_BE/FILLED_IN 
 Requires:   %{name} = %{version}-%{release}
 
-%description -n libswscale-devel
-AV codec library (devel)
+%description -n libavcodec
+AV codec library
 
 %package -n libavcodec-devel
 Summary:    AV codec lib (devel)
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Requires:   libavcodec = %{version}-%{release}
 
 %description -n libavcodec-devel
 AV codec library (devel)
 
-%package -n libavdevice-devel
-Summary:    AV device lib (devel)
-Group:      Development/Libraries
+%package -n libavformat
+Summary:    AV format lib
+Group:      TO_BE/FILLED_IN 
 Requires:   %{name} = %{version}-%{release}
 
-%description -n libavdevice-devel
-AV device library (devel)
+%description -n libavformat
+AV format library
 
 %package -n libavformat-devel
 Summary:    AV format lib (devel)
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Requires:   libavformat = %{version}-%{release}
 
 %description -n libavformat-devel
 AV format library (devel)
 
+%package -n libavutil
+Summary:    AV util lib
+Group:      TO_BE/FILLED_IN 
+Requires:   %{name} = %{version}-%{release}
+
+%description -n libavutil
+AV util library
+
 %package -n libavutil-devel
 Summary:    AV util lib (devel)
 Group:      Development/Libraries
-Requires:   %{name} = %{version}-%{release}
+Requires:   libavutil = %{version}-%{release}
 
 %description -n libavutil-devel
 AV util library (devel)
 
+%package -n libswscale
+Summary:    SW scale lib
+Group:      TO_BE/FILLED_IN 
+Requires:   %{name} = %{version}-%{release}
+
+%description -n libswscale
+developement files for libswsacle
+
+%package -n libswscale-devel
+Summary:    SW scale lib (devel)
+Group:      Development/Libraries
+Requires:   libswscale = %{version}-%{release}
+
+%description -n libswscale-devel
+developement files for libswsacle
+
 
 %prep
-%setup -q 
+%setup -q
 
-export CONFIGURE_OPTIONS=" --disable-static    --enable-shared   --disable-postproc \
-	--disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
-	--disable-mmx       --disable-zlib    --disable-network \
-	--disable-ffserver  --disable-ffplay  --disable-ffmpeg  \
-	--disable-avfilter  --enable-avdevice \
-        --disable-bsfs      --disable-filters \
-        --disable-protocols \
-        --enable-protocol=file \
-	--disable-encoders \
-	--disable-muxers \
-	--disable-parsers \
-	--enable-parser=aac     --enable-parser=h264            --enable-parser=mpegaudio \
-	--enable-parser=h263    --enable-parser=mpeg4video      --enable-parser=mpegvideo \
-	--disable-demuxers \
-	--enable-demuxer=aac    --enable-demuxer=h264   --enable-demuxer=mpegts \
-	--enable-demuxer=amr    --enable-demuxer=m4v    --enable-demuxer=mpegtsraw \
-	--enable-demuxer=asf    --enable-demuxer=mmf    --enable-demuxer=mpegvideo \
-	--enable-demuxer=avi    --enable-demuxer=mov    --enable-demuxer=ogg \
-	--enable-demuxer=flac   --enable-demuxer=mp3    --enable-demuxer=wav \
-	--enable-demuxer=h263   --enable-demuxer=mpegps --enable-demuxer=matroska \
-	--enable-demuxer=dv \
-	--disable-decoders \
-	--enable-decoder=alac   --enable-decoder=h264           --enable-decoder=wmv1 \
-	--enable-decoder=flac   --enable-decoder=mpeg4          --enable-decoder=wmv2 \
-	--enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
-	--enable-decoder=vc1 \
-	--enable-decoder=h263i  --enable-decoder=theora	 \
-        --enable-encoder=h263   --enable-encoder=h263p  --enable-encoder=mpeg4   \
-        --enable-decoder=bmp  --enable-encoder=bmp       \
-        --enable-decoder=tiff \
-        --enable-decoder=mp3  --enable-decoder=amrnb    \
-        --enable-encoder=aac  --enable-decoder=aac      \
-	--enable-swscale	--disable-yasm "
+export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postproc \
+--disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
+--disable-mmx       --disable-zlib    --disable-network \
+--disable-ffserver  --disable-ffplay  --disable-ffmpeg  \
+--disable-avfilter  --disable-avdevice \
+--disable-bsfs      --disable-filters \
+--disable-protocols \
+--enable-protocol=file \
+--disable-encoders \
+--disable-muxers \
+--disable-parsers \
+--enable-parser=aac     --enable-parser=h264            --enable-parser=mpegaudio \
+--enable-parser=h263    --enable-parser=mpeg4video      --enable-parser=mpegvideo \
+--disable-demuxers \
+--enable-demuxer=aac    --enable-demuxer=h264   --enable-demuxer=mpegts \
+--enable-demuxer=amr    --enable-demuxer=m4v    --enable-demuxer=mpegtsraw \
+--enable-demuxer=asf    --enable-demuxer=mmf    --enable-demuxer=mpegvideo \
+--enable-demuxer=avi    --enable-demuxer=mov    --enable-demuxer=ogg \
+--enable-demuxer=flac   --enable-demuxer=mp3    --enable-demuxer=wav \
+--enable-demuxer=h263   --enable-demuxer=mpegps --enable-demuxer=matroska \
+--enable-demuxer=dv \
+--disable-decoders \
+--enable-decoder=alac   --enable-decoder=h264           --enable-decoder=wmv1 \
+--enable-decoder=flac   --enable-decoder=mpeg4          --enable-decoder=wmv2 \
+--enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
+--enable-decoder=vc1 \
+--enable-decoder=h263i  --enable-decoder=theora  \
+--enable-encoder=h263   --enable-encoder=h263p  --enable-encoder=mpeg4   \
+--enable-decoder=bmp  --enable-encoder=bmp       \
+--enable-decoder=tiff \
+--enable-decoder=mp3  --enable-decoder=amrnb    \
+--enable-encoder=aac  --enable-decoder=aac      \
+--enable-swscale        --disable-yasm"
+
 CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
-./configure --prefix=%_prefix $CONFIGURE_OPTIONS
+
+./configure --prefix=%{_prefix} $CONFIGURE_OPTIONS
 
 %build
 
@@ -110,32 +136,46 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %files
-/usr/lib/*.so.*
-/usr/bin/ffprobe
-/usr/share/ffmpeg/*
+%exclude /usr/share/ffmpeg/*
+%exclude /usr/bin/ffprobe
 
-%files -n libswscale-devel
-/usr/include/libswscale/swscale.h
-/usr/lib/libswscale.so
-/usr/lib/pkgconfig/libswscale.pc
+%files -n libavcodec
+%defattr(-,root,root,-)
+%{_libdir}/libavcodec.so.*
+
+%files -n libavformat
+%defattr(-,root,root,-)
+%{_libdir}/libavformat.so.*
+
+%files -n libavutil
+%defattr(-,root,root,-)
+%{_libdir}/libavutil.so.*
+
+%files -n libswscale
+%defattr(-,root,root,-)
+%{_libdir}/libswscale.so.*
 
 %files -n libavcodec-devel
+%defattr(-,root,root,-)
 %_includedir/libavcodec/*
 %_libdir/libavcodec.so
 %_libdir/pkgconfig/libavcodec.pc
 
-%files -n libavdevice-devel
-%_includedir/libavdevice/*
-%_libdir/libavdevice.so
-%_libdir/pkgconfig/libavdevice.pc
-
 %files -n libavformat-devel
+%defattr(-,root,root,-)
 %_includedir/libavformat/*
 %_libdir/libavformat.so
 %_libdir/pkgconfig/libavformat.pc
 
 %files -n libavutil-devel
+%defattr(-,root,root,-)
 %_includedir/libavutil/*
 %_libdir/libavutil.so
 %_libdir/pkgconfig/libavutil.pc
+
+%files -n libswscale-devel
+%defattr(-,root,root,-)
+%_includedir/libswscale/*
+%_libdir/libswscale.so
+%_libdir/pkgconfig/libswscale.pc
 
