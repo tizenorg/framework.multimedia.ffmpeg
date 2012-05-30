@@ -5,6 +5,7 @@ Release:    1
 Group:      TO_BE/FILLED_IN
 License:    LGPLv2
 Source0:    %{name}-%{version}.tar.gz
+Source1001: packaging/ffmpeg.manifest 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -120,6 +121,7 @@ CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\
 ./configure --prefix=%{_prefix} $CONFIGURE_OPTIONS
 
 %build
+cp %{SOURCE1001} .
 
 
 make %{?jobs:-j%jobs}
@@ -136,44 +138,53 @@ rm -rf %{buildroot}
 %postun -p /sbin/ldconfig
 
 %files
+%manifest ffmpeg.manifest
 %exclude /usr/share/ffmpeg/*
 %exclude /usr/bin/ffprobe
 
 %files -n libavcodec
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavcodec.so.*
 
 %files -n libavformat
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavformat.so.*
 
 %files -n libavutil
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libavutil.so.*
 
 %files -n libswscale
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %{_libdir}/libswscale.so.*
 
 %files -n libavcodec-devel
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %_includedir/libavcodec/*
 %_libdir/libavcodec.so
 %_libdir/pkgconfig/libavcodec.pc
 
 %files -n libavformat-devel
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %_includedir/libavformat/*
 %_libdir/libavformat.so
 %_libdir/pkgconfig/libavformat.pc
 
 %files -n libavutil-devel
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %_includedir/libavutil/*
 %_libdir/libavutil.so
 %_libdir/pkgconfig/libavutil.pc
 
 %files -n libswscale-devel
+%manifest ffmpeg.manifest
 %defattr(-,root,root,-)
 %_includedir/libswscale/*
 %_libdir/libswscale.so
