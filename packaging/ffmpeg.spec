@@ -1,7 +1,7 @@
 Name:       ffmpeg
 Summary:    AV codec lib
 Version: 0.8.5
-Release:    1
+Release:    15
 Group:      TO_BE/FILLED_IN
 License:    LGPLv2
 Source0:    %{name}-%{version}.tar.gz
@@ -15,8 +15,7 @@ AV codec library
 
 %package -n libavcodec
 Summary:    AV codec lib
-Group:      TO_BE/FILLED_IN 
-Requires:   %{name} = %{version}-%{release}
+Group:      TO_BE/FILLED_IN
 
 %description -n libavcodec
 AV codec library
@@ -31,8 +30,7 @@ AV codec library (devel)
 
 %package -n libavformat
 Summary:    AV format lib
-Group:      TO_BE/FILLED_IN 
-Requires:   %{name} = %{version}-%{release}
+Group:      TO_BE/FILLED_IN
 
 %description -n libavformat
 AV format library
@@ -47,8 +45,7 @@ AV format library (devel)
 
 %package -n libavutil
 Summary:    AV util lib
-Group:      TO_BE/FILLED_IN 
-Requires:   %{name} = %{version}-%{release}
+Group:      TO_BE/FILLED_IN
 
 %description -n libavutil
 AV util library
@@ -61,10 +58,24 @@ Requires:   libavutil = %{version}-%{release}
 %description -n libavutil-devel
 AV util library (devel)
 
+%package -n libavfilter
+Summary:    AV util lib
+Group:      TO_BE/FILLED_IN
+
+%description -n libavfilter
+AV filter library
+
+%package -n libavfilter-devel
+Summary:    AV util lib (devel)
+Group:      Development/Libraries
+Requires:   libavfilter = %{version}-%{release}
+
+%description -n libavfilter-devel
+AV filter library (devel)
+
 %package -n libswscale
 Summary:    SW scale lib
-Group:      TO_BE/FILLED_IN 
-Requires:   %{name} = %{version}-%{release}
+Group:      TO_BE/FILLED_IN
 
 %description -n libswscale
 developement files for libswsacle
@@ -84,9 +95,13 @@ developement files for libswsacle
 export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postproc \
 --disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
 --disable-mmx       --disable-zlib    --disable-network \
---disable-ffserver  --disable-ffplay  --disable-ffmpeg  \
---disable-avfilter  --disable-avdevice \
+--disable-ffserver  --disable-ffplay  --disable-ffmpeg  --disable-ffprobe \
+--disable-avdevice \
 --disable-bsfs      --disable-filters \
+--enable-filter=buffer  --enable-filter=buffersink      --enable-filter=crop \
+--enable-filter=hflip   --enable-filter=lut     --enable-filter=lutyuv \
+--enable-filter=lutrgb  --enable-filter=overlay --enable-filter=scale \
+--enable-filter=transpose       --enable-filter=unsharp --enable-filter=vflip \
 --disable-protocols \
 --enable-protocol=file \
 --disable-encoders \
@@ -108,6 +123,7 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postpr
 --enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
 --enable-decoder=vc1 \
 --enable-decoder=h263i  --enable-decoder=theora  \
+--enable-decoder=pcm_alaw  --enable-decoder=pcm_mulaw  \
 --enable-encoder=h263   --enable-encoder=h263p  --enable-encoder=mpeg4   \
 --enable-decoder=bmp  --enable-encoder=bmp       \
 --enable-decoder=tiff \
@@ -135,10 +151,6 @@ rm -rf %{buildroot}
 
 %postun -p /sbin/ldconfig
 
-%files
-%exclude /usr/share/ffmpeg/*
-%exclude /usr/bin/ffprobe
-
 %files -n libavcodec
 %defattr(-,root,root,-)
 %{_libdir}/libavcodec.so.*
@@ -150,6 +162,10 @@ rm -rf %{buildroot}
 %files -n libavutil
 %defattr(-,root,root,-)
 %{_libdir}/libavutil.so.*
+
+%files -n libavfilter
+%defattr(-,root,root,-)
+%{_libdir}/libavfilter.so.*
 
 %files -n libswscale
 %defattr(-,root,root,-)
@@ -172,6 +188,12 @@ rm -rf %{buildroot}
 %_includedir/libavutil/*
 %_libdir/libavutil.so
 %_libdir/pkgconfig/libavutil.pc
+
+%files -n libavfilter-devel
+%defattr(-,root,root,-)
+%_includedir/libavfilter/*
+%_libdir/libavfilter.so
+%_libdir/pkgconfig/libavfilter.pc
 
 %files -n libswscale-devel
 %defattr(-,root,root,-)

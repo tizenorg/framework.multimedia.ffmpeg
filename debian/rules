@@ -25,9 +25,13 @@ CFLAGS += -fPIC
 CONFIGURE_OPTIONS = --disable-static    --enable-shared   --disable-postproc \
 	--disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
 	--disable-mmx       --disable-zlib    --disable-network \
-	--disable-ffserver  --disable-ffplay  --disable-ffmpeg  \
-	--disable-avfilter  --disable-avdevice \
+	--disable-ffserver  --disable-ffplay  --disable-ffmpeg	--disable-ffprobe \
+	--disable-avdevice \
 	--disable-bsfs	    --disable-filters \
+	--enable-filter=buffer	--enable-filter=buffersink	--enable-filter=crop \
+	--enable-filter=hflip	--enable-filter=lut	--enable-filter=lutyuv \
+	--enable-filter=lutrgb	--enable-filter=overlay	--enable-filter=scale \
+	--enable-filter=transpose	--enable-filter=unsharp	--enable-filter=vflip \
 	--disable-protocols \
 	--enable-protocol=file \
 	--disable-encoders \
@@ -48,7 +52,9 @@ CONFIGURE_OPTIONS = --disable-static    --enable-shared   --disable-postproc \
 	--enable-decoder=flac   --enable-decoder=mpeg4          --enable-decoder=wmv2 \
 	--enable-decoder=h263   --enable-decoder=mpegvideo      --enable-decoder=wmv3 \
 	--enable-decoder=vc1 \
+	--enable-decoder=msmpeg4v3 \
 	--enable-decoder=h263i  --enable-decoder=theora	 \
+	--enable-decoder=pcm_alaw  --enable-decoder=pcm_mulaw	 \
 	--enable-encoder=h263   --enable-encoder=h263p	--enable-encoder=mpeg4	 \
 	--enable-decoder=bmp  --enable-encoder=bmp	 \
 	--enable-decoder=tiff \

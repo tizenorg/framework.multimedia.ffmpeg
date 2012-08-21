@@ -41,6 +41,18 @@ Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libavformat (= ${Source-Version})
 Description: development files for libavformat
 
+Package: libavfilter
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: libavfilter library
+
+Package: libavfilter-dev
+Section: libdevel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libavfilter (= ${Source-Version})
+Description: development files for libavfilter
+
 Package: libswscale
 Section: libs
 Architecture: any

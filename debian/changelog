@@ -1,45 +1,132 @@
-ffmpeg (0.8.5-4) unstable; urgency=low
+ffmpeg (0.8.5-15) unstable; urgency=low
+
+  * enable pcm alaw, mulaw decoder to support OSP
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-15
+
+ -- root <backto.kim@samsung.com>  Mon, 13 Aug 2012 18:56:43 +0900
+
+ffmpeg (0.8.5-14) unstable; urgency=low
+
+  * just version up
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-14
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Mon, 04 Jun 2012 11:21:23 +0900
+
+ffmpeg (0.8.5-13) unstable; urgency=low
+
+  * enable some fileters to support OSP
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-13
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Thu, 31 May 2012 18:45:38 +0900
+
+ffmpeg (0.8.5-12) unstable; urgency=low
+
+  * enable msmpeg4v3 decoder
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-12
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Tue, 03 Apr 2012 14:07:27 +0900
+
+ffmpeg (0.8.5-11) unstable; urgency=low
+
+  * update spec file
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-11
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Thu, 22 Mar 2012 12:08:45 +0900
+
+ffmpeg (0.8.5-10) unstable; urgency=low
+
+  * remove useless avdevice related install files
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-10
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Wed, 22 Feb 2012 10:22:52 +0900
+
+ffmpeg (0.8.5-9) unstable; urgency=low
+
+  * enable encoder h263, h263p, mpeg4 to support BADA
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-9
+
+ -- Haejoeng Kim <backto.kim@samsung.com>  Fri, 10 Feb 2012 09:51:40 +0900
+
+ffmpeg (0.8.5-8) unstable; urgency=low
 
   * bug fix. ffmpeg can't extract year (WM/Year) of wma format.
-  * Git : unmodified/ffmpeg
-  * Tag : ffmpeg_0.8.5-4
+  * enable aac encoder to support BADA.
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-8
 
  -- Haejeong Kim <backto.kim@samsung.com>  Fri, 03 Feb 2012 10:01:52 +0900
 
-ffmpeg (0.8.5-3) unstable; urgency=low
+ffmpeg (0.8.5-7) unstable; urgency=low
 
-  * disable unused options : filter, bsf, protocol
-  * Git : unmodified/ffmpeg
-  * Tag : ffmpeg_0.8.5-3
+  * disable unused options -> filter, bsf, protocol
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-7
 
  -- Haejeong Kim <backto.kim@samsung.com>  Thu, 05 Jan 2012 10:07:01 +0900
 
-ffmpeg (0.8.5-2) unstable; urgency=low
+ffmpeg (0.8.5-6) unstable; urgency=low
 
-  * enable some codecs
+  * enable codec to support BADA platform.
   * bmp : enc/dec, tif : dec
   * mp3/amrnb/aac : dec
-  * aac, h263, h263p, mpeg4 : enc
-  * Git : unmodified/ffmpeg
-  * Tag : ffmpeg_0.8.5-2
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-6
 
  -- Haejeong Kim <backto.kim@samsung.com>  Wed, 04 Jan 2012 11:12:54 +0900
 
-ffmpeg (0.8.5-1) unstable; urgency=low
+ffmpeg (0.8.5-5) unstable; urgency=low
 
-  * bug fix.
-  * 1. some m4a(aac) file's info is 0.
+  * patch code to fix bugs. 
+  * 1. some m4a(aac) file's info is 0. 
   * 2. some m4a(aac) and ogg file's find stream info fail.
-  * Git : unmodified/ffmpeg
-  * Tag : ffmpeg_0.8.5-1
+  * Git : slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-5
 
  -- Haejeong Kim <backto.kim@samsung.com>  Tue, 03 Jan 2012 15:18:04 +0900
 
-ffmpeg (0.8.5) unstable; urgency=low
+ffmpeg (0.8.5-4) unstable; urgency=low
 
-  * Initial Release.
-  * Git : unmodified/ffmpeg
-  * Tag : ffmpeg_0.8.5
+  * disable build avfilter and avdevice
+  * Git : 165.213.180.234:slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-4
 
- -- Haejeong Kim <backto.kim@samsung.com>  Wed, 07 Dec 2011 12:22:56 +0900
+ -- Haejeong Kim <backto.kim@samsung.com>  Fri, 09 Dec 2011 13:07:57 +0900
 
+ffmpeg (0.8.5-3) unstable; urgency=low
+
+  * add option. --disable-version3
+  * Git : 165.213.180.234:slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-3
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Wed, 07 Dec 2011 14:08:15 +0900
+
+ffmpeg (0.8.5-2) unstable; urgency=low
+
+  * dependency error fix
+  * Git : 165.213.180.234:slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-2
+
+ -- root <backto.kim@samsung.com>  Wed, 07 Dec 2011 10:22:56 +0900
+
+ffmpeg (0.8.5-1) unstable; urgency=low
+
+  * make .so (enable shared, disabled static)
+  * Git : 165.213.180.234:slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-1
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Mon, 05 Dec 2011 17:54:22 +0900
+
+ffmpeg (0.8.5-0) unstable; urgency=low
+
+  * Initial Release. - ffmpeg 0.8.5
+  * Git : 165.213.180.234:slp/unmodified/ffmpeg
+  * Tag : ffmpeg_0.8.5-0
+
+ -- Haejeong Kim <backto.kim@samsung.com>  Mon, 24 Oct 2011 13:45:53 +0900
