@@ -2,11 +2,9 @@ Name:       ffmpeg
 Summary:    AV codec lib
 Version: 1.0.0
 Release:    6
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 License:    LGPLv2.1
 Source0:    %{name}-%{version}.tar.gz
-Requires(post): /sbin/ldconfig
-Requires(postun): /sbin/ldconfig
 
 
 %description
@@ -15,7 +13,7 @@ AV codec library
 
 %package -n libavcodec
 Summary:    AV codec lib
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 
 %description -n libavcodec
 AV codec library
@@ -30,7 +28,7 @@ AV codec library (devel)
 
 %package -n libavformat
 Summary:    AV format lib
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 
 %description -n libavformat
 AV format library
@@ -45,7 +43,7 @@ AV format library (devel)
 
 %package -n libavutil
 Summary:    AV util lib
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 
 %description -n libavutil
 AV util library
@@ -60,7 +58,7 @@ AV util library (devel)
 
 %package -n libavfilter
 Summary:    AV util lib
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 
 %description -n libavfilter
 AV filter library
@@ -75,7 +73,7 @@ AV filter library (devel)
 
 %package -n libswscale
 Summary:    SW scale lib
-Group:      TO_BE/FILLED_IN
+Group:      Multimedia
 
 %description -n libswscale
 developement files for libswsacle
@@ -135,9 +133,9 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postpr
 CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
 
 %ifarch %{arm}
-./configure --prefix=%{_prefix} $CONFIGURE_OPTIONS --extra-cflags="-mfpu=neon"
+./configure --prefix=%{_prefix} --libdir=%_libdir  --shlibdir=%_libdir $CONFIGURE_OPTIONS --extra-cflags="-mfpu=neon"
 %else
-./configure --prefix=%{_prefix} $CONFIGURE_OPTIONS
+./configure --prefix=%{_prefix} --shlibdir=%_libdir --libdir=%_libdir  $CONFIGURE_OPTIONS
 %endif
 
 %build
