@@ -2278,6 +2278,8 @@ static int mov_read_meta(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             avio_seek(pb, -8, SEEK_CUR);
             atom.size += 8;
             return mov_read_default(c, pb, atom);
+        } else {		//PIFF(isma, ismv) is ISO base format. but this contents has no hdlr box.
+			 return mov_read_default(c, pb, atom);
         }
     }
     return 0;

@@ -1,7 +1,7 @@
 Name:       ffmpeg
 Summary:    AV codec lib
 Version: 1.0.0
-Release:    4
+Release:    6
 Group:      TO_BE/FILLED_IN
 License:    LGPLv2.1
 Source0:    %{name}-%{version}.tar.gz
@@ -11,6 +11,7 @@ Requires(postun): /sbin/ldconfig
 
 %description
 AV codec library
+
 
 %package -n libavcodec
 Summary:    AV codec lib
