@@ -1,7 +1,7 @@
 Name:       ffmpeg
 Summary:    AV codec lib
 Version: 1.0.0
-Release:    6
+Release:    7
 Group:      Multimedia
 License:    LGPLv2.1
 Source0:    %{name}-%{version}.tar.gz
@@ -92,7 +92,7 @@ developement files for libswsacle
 
 export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postproc \
 --disable-version3  --disable-devices   --disable-nonfree --disable-gpl --disable-doc \
---disable-mmx       --disable-zlib    --disable-network \
+--disable-zlib    --disable-network \
 --disable-ffserver  --disable-ffplay  --disable-ffmpeg  --disable-ffprobe \
 --disable-avdevice \
 --disable-bsfs      --disable-filters \
@@ -128,7 +128,13 @@ export CONFIGURE_OPTIONS="--enable-shared    --disable-static   --disable-postpr
 --enable-decoder=mp3  --enable-decoder=amrnb    \
 --enable-encoder=aac  --enable-decoder=aac      \
 --enable-swscale        --disable-yasm	--disable-swresample	\
---enable-fft	--enable-rdft	--enable-mdct	--enable-neon"
+--enable-fft    --enable-rdft   --enable-mdct   --enable-neon \
+--disable-stripping \
+"
+%ifarch %{arm}
+export CONFIGURE_OPTIONS+="--disable-mmx"
+%else
+%endif
 
 CFLAGS="%{optflags} -fPIC -DEXPORT_API=\"__attribute__((visibility(\\\"default\\\")))\" "; export CFLAGS
 
