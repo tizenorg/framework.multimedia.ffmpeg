@@ -1,7 +1,7 @@
 Name:       ffmpeg
 Summary:    AV codec lib
 Version: 1.0.0
-Release:    10
+Release:    11
 Group:      Multimedia
 License:    LGPLv2.1
 Source0:    %{name}-%{version}.tar.gz
