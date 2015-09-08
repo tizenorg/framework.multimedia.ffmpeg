@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/*!
+/**
  * @file
  * header for Xvid IDCT functions
  */
@@ -28,8 +28,16 @@
 
 #include <stdint.h>
 
+#include "libavcodec/dsputil.h"
+
 void ff_idct_xvid_mmx(short *block);
+void ff_idct_xvid_mmx_put(uint8_t *dest, int line_size, DCTELEM *block);
+void ff_idct_xvid_mmx_add(uint8_t *dest, int line_size, DCTELEM *block);
+
 void ff_idct_xvid_mmx2(short *block);
+void ff_idct_xvid_mmx2_put(uint8_t *dest, int line_size, DCTELEM *block);
+void ff_idct_xvid_mmx2_add(uint8_t *dest, int line_size, DCTELEM *block);
+
 void ff_idct_xvid_sse2(short *block);
 void ff_idct_xvid_sse2_put(uint8_t *dest, int line_size, short *block);
 void ff_idct_xvid_sse2_add(uint8_t *dest, int line_size, short *block);

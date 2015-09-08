@@ -1,5 +1,5 @@
 /*
- * Micrsoft RLE Video Decoder
+ * Microsoft RLE video decoder
  * Copyright (C) 2003 the ffmpeg project
  *
  * This file is part of FFmpeg.
@@ -21,7 +21,7 @@
 
 /**
  * @file
- * MS RLE Video Decoder by Mike Melanson (melanson@pcisys.net)
+ * MS RLE video decoder by Mike Melanson (melanson@pcisys.net)
  * For more information about the MS RLE format, visit:
  *   http://www.pcisys.net/~melanson/codecs/
  *
@@ -40,6 +40,7 @@ typedef struct MsrleContext {
     AVCodecContext *avctx;
     AVFrame frame;
 
+    GetByteContext gb;
     const unsigned char *buf;
     int size;
 
@@ -49,6 +50,7 @@ typedef struct MsrleContext {
 static av_cold int msrle_decode_init(AVCodecContext *avctx)
 {
     MsrleContext *s = avctx->priv_data;
+    int i;
 
     s->avctx = avctx;
 
@@ -71,6 +73,10 @@ static av_cold int msrle_decode_init(AVCodecContext *avctx)
     avcodec_get_frame_defaults(&s->frame);
     s->frame.data[0] = NULL;
 
+    if (avctx->extradata_size >= AVPALETTE_SIZE)
+        for (i = 0; i < AVPALETTE_SIZE/4; i++)
+            s->pal[i] = 0xFF<<24 | AV_RL32(avctx->extradata+4*i);
+
     return 0;
 }
 
@@ -86,7 +92,7 @@ static int msrle_decode_frame(AVCodecContext *avctx,
     s->buf = buf;
     s->size = buf_size;
 
-    s->frame.reference = 1;
+    s->frame.reference = 3;
     s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
     if (avctx->reget_buffer(avctx, &s->frame)) {
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
@@ -100,14 +106,13 @@ static int msrle_decode_frame(AVCodecContext *avctx,
             s->frame.palette_has_changed = 1;
             memcpy(s->pal, pal, AVPALETTE_SIZE);
         }
-
         /* make the palette available */
         memcpy(s->frame.data[1], s->pal, AVPALETTE_SIZE);
     }
 
     /* FIXME how to correctly detect RLE ??? */
     if (avctx->height * istride == avpkt->size) { /* assume uncompressed */
-        int linesize = avctx->width * avctx->bits_per_coded_sample / 8;
+        int linesize = (avctx->width * avctx->bits_per_coded_sample + 7) / 8;
         uint8_t *ptr = s->frame.data[0];
         uint8_t *buf = avpkt->data + (avctx->height-1)*istride;
         int i, j;
@@ -127,7 +132,8 @@ static int msrle_decode_frame(AVCodecContext *avctx,
             ptr += s->frame.linesize[0];
         }
     } else {
-        ff_msrle_decode(avctx, (AVPicture*)&s->frame, avctx->bits_per_coded_sample, buf, buf_size);
+        bytestream2_init(&s->gb, buf, buf_size);
+        ff_msrle_decode(avctx, (AVPicture*)&s->frame, avctx->bits_per_coded_sample, &s->gb);
     }
 
     *data_size = sizeof(AVFrame);
@@ -149,14 +155,13 @@ static av_cold int msrle_decode_end(AVCodecContext *avctx)
 }
 
 AVCodec ff_msrle_decoder = {
-    "msrle",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_MSRLE,
-    sizeof(MsrleContext),
-    msrle_decode_init,
-    NULL,
-    msrle_decode_end,
-    msrle_decode_frame,
-    CODEC_CAP_DR1,
-    .long_name= NULL_IF_CONFIG_SMALL("Microsoft RLE"),
+    .name           = "msrle",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_MSRLE,
+    .priv_data_size = sizeof(MsrleContext),
+    .init           = msrle_decode_init,
+    .close          = msrle_decode_end,
+    .decode         = msrle_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
+    .long_name      = NULL_IF_CONFIG_SMALL("Microsoft RLE"),
 };

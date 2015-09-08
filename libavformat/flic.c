@@ -34,6 +34,7 @@
 #include "libavutil/intreadwrite.h"
 #include "libavutil/audioconvert.h"
 #include "avformat.h"
+#include "internal.h"
 
 #define FLIC_FILE_MAGIC_1 0xAF11
 #define FLIC_FILE_MAGIC_2 0xAF12
@@ -82,8 +83,7 @@ static int flic_probe(AVProbeData *p)
     return AVPROBE_SCORE_MAX;
 }
 
-static int flic_read_header(AVFormatContext *s,
-                            AVFormatParameters *ap)
+static int flic_read_header(AVFormatContext *s)
 {
     FlicDemuxContext *flic = s->priv_data;
     AVIOContext *pb = s->pb;
@@ -105,12 +105,12 @@ static int flic_read_header(AVFormatContext *s,
         speed = FLIC_DEFAULT_SPEED;
 
     /* initialize the decoder streams */
-    st = av_new_stream(s, 0);
+    st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
     flic->video_stream_index = st->index;
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id = CODEC_ID_FLIC;
+    st->codec->codec_id = AV_CODEC_ID_FLIC;
     st->codec->codec_tag = 0;  /* no fourcc */
     st->codec->width = AV_RL16(&header[0x08]);
     st->codec->height = AV_RL16(&header[0x0A]);
@@ -145,7 +145,7 @@ static int flic_read_header(AVFormatContext *s,
      */
     if (AV_RL16(&preamble[4]) == FLIC_TFTD_CHUNK_AUDIO) {
         /* TFTD videos have an extra 22050 Hz 8-bit mono audio stream */
-        ast = av_new_stream(s, 1);
+        ast = avformat_new_stream(s, NULL);
         if (!ast)
             return AVERROR(ENOMEM);
 
@@ -154,7 +154,7 @@ static int flic_read_header(AVFormatContext *s,
         /* all audio frames are the same size, so use the size of the first chunk for block_align */
         ast->codec->block_align = AV_RL32(&preamble[0]);
         ast->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-        ast->codec->codec_id = CODEC_ID_PCM_U8;
+        ast->codec->codec_id = AV_CODEC_ID_PCM_U8;
         ast->codec->codec_tag = 0;
         ast->codec->sample_rate = FLIC_TFTD_SAMPLE_RATE;
         ast->codec->channels = 1;
@@ -167,10 +167,10 @@ static int flic_read_header(AVFormatContext *s,
         /* Since the header information is incorrect we have to figure out the
          * framerate using block_align and the fact that the audio is 22050 Hz.
          * We usually have two cases: 2205 -> 10 fps and 1470 -> 15 fps */
-        av_set_pts_info(st, 64, ast->codec->block_align, FLIC_TFTD_SAMPLE_RATE);
-        av_set_pts_info(ast, 64, 1, FLIC_TFTD_SAMPLE_RATE);
+        avpriv_set_pts_info(st, 64, ast->codec->block_align, FLIC_TFTD_SAMPLE_RATE);
+        avpriv_set_pts_info(ast, 64, 1, FLIC_TFTD_SAMPLE_RATE);
     } else if (AV_RL16(&header[0x10]) == FLIC_CHUNK_MAGIC_1) {
-        av_set_pts_info(st, 64, FLIC_MC_SPEED, 70);
+        avpriv_set_pts_info(st, 64, FLIC_MC_SPEED, 70);
 
         /* rewind the stream since the first chunk is at offset 12 */
         avio_seek(pb, 12, SEEK_SET);
@@ -182,12 +182,12 @@ static int flic_read_header(AVFormatContext *s,
         memcpy(st->codec->extradata, header, 12);
 
     } else if (magic_number == FLIC_FILE_MAGIC_1) {
-        av_set_pts_info(st, 64, speed, 70);
+        avpriv_set_pts_info(st, 64, speed, 70);
     } else if ((magic_number == FLIC_FILE_MAGIC_2) ||
                (magic_number == FLIC_FILE_MAGIC_3)) {
-        av_set_pts_info(st, 64, speed, 1000);
+        avpriv_set_pts_info(st, 64, speed, 1000);
     } else {
-        av_log(s, AV_LOG_INFO, "Invalid or unsupported magic chunk in file\n");
+        av_log(s, AV_LOG_ERROR, "Invalid or unsupported magic chunk in file\n");
         return AVERROR_INVALIDDATA;
     }
 
@@ -261,10 +261,10 @@ static int flic_read_packet(AVFormatContext *s,
 }
 
 AVInputFormat ff_flic_demuxer = {
-    "flic",
-    NULL_IF_CONFIG_SMALL("FLI/FLC/FLX animation format"),
-    sizeof(FlicDemuxContext),
-    flic_probe,
-    flic_read_header,
-    flic_read_packet,
+    .name           = "flic",
+    .long_name      = NULL_IF_CONFIG_SMALL("FLI/FLC/FLX animation"),
+    .priv_data_size = sizeof(FlicDemuxContext),
+    .read_probe     = flic_probe,
+    .read_header    = flic_read_header,
+    .read_packet    = flic_read_packet,
 };

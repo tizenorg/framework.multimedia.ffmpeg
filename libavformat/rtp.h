@@ -21,17 +21,17 @@
 #ifndef AVFORMAT_RTP_H
 #define AVFORMAT_RTP_H
 
+#include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
 
 /**
- * Return the payload type for a given codec.
+ * Return the payload type for a given codec used in the given format context.
  *
+ * @param fmt   The context of the format
  * @param codec The context of the codec
- * @return In case of unknown payload type or dynamic payload type, a
- * negative value is returned; otherwise, the payload type (the 'PT' field
- * in the RTP header) is returned.
+ * @return The payload type (the 'PT' field in the RTP header).
  */
-int ff_rtp_get_payload_type(AVCodecContext *codec);
+int ff_rtp_get_payload_type(AVFormatContext *fmt, AVCodecContext *codec);
 
 /**
  * Initialize a codec context based on the payload type.
@@ -63,21 +63,21 @@ const char *ff_rtp_enc_name(int payload_type);
  *
  * @param buf A pointer to the string containing the encoding name
  * @param codec_type The codec type
- * @return In case of unknown encoding name, CODEC_ID_NONE is returned;
+ * @return In case of unknown encoding name, AV_CODEC_ID_NONE is returned;
  * otherwise, the codec id is returned
  */
-enum CodecID ff_rtp_codec_id(const char *buf, enum AVMediaType codec_type);
+enum AVCodecID ff_rtp_codec_id(const char *buf, enum AVMediaType codec_type);
 
 #define RTP_PT_PRIVATE 96
 #define RTP_VERSION 2
 #define RTP_MAX_SDES 256   /**< maximum text length for SDES */
 
-/* RTCP paquets use 0.5 % of the bandwidth */
+/* RTCP packets use 0.5% of the bandwidth */
 #define RTCP_TX_RATIO_NUM 5
 #define RTCP_TX_RATIO_DEN 1000
 
 /* An arbitrary id value for RTP Xiph streams - only relevant to indicate
- * the the configuration has changed within a stream (by changing the
+ * that the configuration has changed within a stream (by changing the
  * ident value sent).
  */
 #define RTP_XIPH_IDENT 0xfecdba
@@ -90,5 +90,7 @@ enum RTCPType {
     RTCP_BYE,  // 203
     RTCP_APP   // 204
 };
+
+#define RTP_PT_IS_RTCP(x) ((x) >= RTCP_SR && (x) <= RTCP_APP)
 
 #endif /* AVFORMAT_RTP_H */

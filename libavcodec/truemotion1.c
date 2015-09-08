@@ -36,6 +36,8 @@
 #include "avcodec.h"
 #include "dsputil.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/internal.h"
+#include "libavutil/mem.h"
 
 #include "truemotion1data.h"
 
@@ -310,18 +312,17 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     int width_shift = 0;
     int new_pix_fmt;
     struct frame_header header;
-    uint8_t header_buffer[128];  /* logical maximum size of the header */
+    uint8_t header_buffer[128] = { 0 };  /* logical maximum size of the header */
     const uint8_t *sel_vector_table;
 
     header.header_size = ((s->buf[0] >> 5) | (s->buf[0] << 3)) & 0x7f;
-    if (s->buf[0] < 0x10)
+    if (s->buf[0] < 0x10 || header.header_size >= s->size)
     {
         av_log(s->avctx, AV_LOG_ERROR, "invalid header size (%d)\n", s->buf[0]);
         return -1;
     }
 
     /* unscramble the header bytes with a XOR operation */
-    memset(header_buffer, 0, 128);
     for (i = 1; i < header.header_size; i++)
         header_buffer[i - 1] = s->buf[i] ^ s->buf[i + 1];
 
@@ -355,14 +356,7 @@ static int truemotion1_decode_header(TrueMotion1Context *s)
     if (s->flags & FLAG_SPRITE) {
         av_log_ask_for_sample(s->avctx, "SPRITE frame found.\n");
         /* FIXME header.width, height, xoffset and yoffset aren't initialized */
-#if 0
-        s->w = header.width;
-        s->h = header.height;
-        s->x = header.xoffset;
-        s->y = header.yoffset;
-#else
         return -1;
-#endif
     } else {
         s->w = header.xsize;
         s->h = header.ysize;
@@ -520,6 +514,10 @@ hres,vres,i,i%vres (0 < i < 4)
 }
 
 #define APPLY_C_PREDICTOR() \
+    if(index > 1023){\
+        av_log(s->avctx, AV_LOG_ERROR, " index %d went out of bounds\n", index); \
+        return; \
+    }\
     predictor_pair = s->c_predictor_table[index]; \
     horiz_pred += (predictor_pair >> 1); \
     if (predictor_pair & 1) { \
@@ -537,6 +535,10 @@ hres,vres,i,i%vres (0 < i < 4)
         index++;
 
 #define APPLY_C_PREDICTOR_24() \
+    if(index > 1023){\
+        av_log(s->avctx, AV_LOG_ERROR, " index %d went out of bounds\n", index); \
+        return; \
+    }\
     predictor_pair = s->c_predictor_table[index]; \
     horiz_pred += (predictor_pair >> 1); \
     if (predictor_pair & 1) { \
@@ -555,6 +557,10 @@ hres,vres,i,i%vres (0 < i < 4)
 
 
 #define APPLY_Y_PREDICTOR() \
+    if(index > 1023){\
+        av_log(s->avctx, AV_LOG_ERROR, " index %d went out of bounds\n", index); \
+        return; \
+    }\
     predictor_pair = s->y_predictor_table[index]; \
     horiz_pred += (predictor_pair >> 1); \
     if (predictor_pair & 1) { \
@@ -572,6 +578,10 @@ hres,vres,i,i%vres (0 < i < 4)
         index++;
 
 #define APPLY_Y_PREDICTOR_24() \
+    if(index > 1023){\
+        av_log(s->avctx, AV_LOG_ERROR, " index %d went out of bounds\n", index); \
+        return; \
+    }\
     predictor_pair = s->y_predictor_table[index]; \
     horiz_pred += (predictor_pair >> 1); \
     if (predictor_pair & 1) { \
@@ -859,7 +869,7 @@ static int truemotion1_decode_frame(AVCodecContext *avctx,
     if (truemotion1_decode_header(s) == -1)
         return -1;
 
-    s->frame.reference = 1;
+    s->frame.reference = 3;
     s->frame.buffer_hints = FF_BUFFER_HINTS_VALID |
         FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
     if (avctx->reget_buffer(avctx, &s->frame) < 0) {
@@ -893,14 +903,13 @@ static av_cold int truemotion1_decode_end(AVCodecContext *avctx)
 }
 
 AVCodec ff_truemotion1_decoder = {
-    "truemotion1",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_TRUEMOTION1,
-    sizeof(TrueMotion1Context),
-    truemotion1_decode_init,
-    NULL,
-    truemotion1_decode_end,
-    truemotion1_decode_frame,
-    CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 1.0"),
+    .name           = "truemotion1",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_TRUEMOTION1,
+    .priv_data_size = sizeof(TrueMotion1Context),
+    .init           = truemotion1_decode_init,
+    .close          = truemotion1_decode_end,
+    .decode         = truemotion1_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
+    .long_name      = NULL_IF_CONFIG_SMALL("Duck TrueMotion 1.0"),
 };

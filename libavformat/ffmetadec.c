@@ -19,6 +19,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include "libavutil/mathematics.h"
 #include "avformat.h"
 #include "ffmeta.h"
 #include "internal.h"
@@ -74,7 +75,7 @@ static AVChapter *read_chapter(AVFormatContext *s)
         end = AV_NOPTS_VALUE;
     }
 
-    return ff_new_chapter(s, s->nb_chapters, tb, start, end, NULL);
+    return avpriv_new_chapter(s, s->nb_chapters, tb, start, end, NULL);
 }
 
 static uint8_t *unescape(uint8_t *buf, int size)
@@ -122,7 +123,7 @@ static int read_tag(uint8_t *line, AVDictionary **m)
     return 0;
 }
 
-static int read_header(AVFormatContext *s, AVFormatParameters *ap)
+static int read_header(AVFormatContext *s)
 {
     AVDictionary **m = &s->metadata;
     uint8_t line[1024];
@@ -131,13 +132,13 @@ static int read_header(AVFormatContext *s, AVFormatParameters *ap)
         get_line(s->pb, line, sizeof(line));
 
         if (!memcmp(line, ID_STREAM, strlen(ID_STREAM))) {
-            AVStream *st = av_new_stream(s, 0);
+            AVStream *st = avformat_new_stream(s, NULL);
 
             if (!st)
                 return -1;
 
             st->codec->codec_type = AVMEDIA_TYPE_DATA;
-            st->codec->codec_id   = CODEC_ID_FFMETADATA;
+            st->codec->codec_id   = AV_CODEC_ID_FFMETADATA;
 
             m = &st->metadata;
         } else if (!memcmp(line, ID_CHAPTER, strlen(ID_CHAPTER))) {
@@ -167,7 +168,7 @@ static int read_packet(AVFormatContext *s, AVPacket *pkt)
 
 AVInputFormat ff_ffmetadata_demuxer = {
     .name        = "ffmetadata",
-    .long_name   = NULL_IF_CONFIG_SMALL("FFmpeg metadata in text format"),
+    .long_name   = NULL_IF_CONFIG_SMALL("FFmpeg metadata in text"),
     .read_probe  = probe,
     .read_header = read_header,
     .read_packet = read_packet,

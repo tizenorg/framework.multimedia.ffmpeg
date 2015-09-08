@@ -31,6 +31,10 @@
 #include "libavcodec/avcodec.h"
 #include "avio.h"
 #include "internal.h"
+#include "metadata.h"
+
+extern const AVMetadataConv ff_riff_info_conv[];
+extern const char ff_riff_tags[][5];
 
 int64_t ff_start_tag(AVIOContext *pb, const char *tag);
 void ff_end_tag(AVIOContext *pb, int64_t start);
@@ -40,21 +44,23 @@ void ff_end_tag(AVIOContext *pb, int64_t start);
  * bits_per_encoded_sample fields. Does not read extradata.
  * @return codec tag
  */
-int ff_get_bmp_header(AVIOContext *pb, AVStream *st);
+int ff_get_bmp_header(AVIOContext *pb, AVStream *st, unsigned *esize);
 
 void ff_put_bmp_header(AVIOContext *pb, AVCodecContext *enc, const AVCodecTag *tags, int for_asf);
 int ff_put_wav_header(AVIOContext *pb, AVCodecContext *enc);
-enum CodecID ff_wav_codec_get_id(unsigned int tag, int bps);
+enum AVCodecID ff_wav_codec_get_id(unsigned int tag, int bps);
 int ff_get_wav_header(AVIOContext *pb, AVCodecContext *codec, int size);
 
 extern const AVCodecTag ff_codec_bmp_tags[];
 extern const AVCodecTag ff_codec_wav_tags[];
 
-unsigned int ff_codec_get_tag(const AVCodecTag *tags, enum CodecID id);
-enum CodecID ff_codec_get_id(const AVCodecTag *tags, unsigned int tag);
+unsigned int ff_codec_get_tag(const AVCodecTag *tags, enum AVCodecID id);
+enum AVCodecID ff_codec_get_id(const AVCodecTag *tags, unsigned int tag);
 void ff_parse_specific_params(AVCodecContext *stream, int *au_rate, int *au_ssize, int *au_scale);
 
 typedef uint8_t ff_asf_guid[16];
+
+int ff_read_riff_info(AVFormatContext *s, int64_t size);
 
 #define FF_PRI_GUID \
     "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x"
@@ -69,11 +75,11 @@ static av_always_inline int ff_guidcmp(const void *g1, const void *g2)
 void ff_get_guid(AVIOContext *s, ff_asf_guid *g);
 
 typedef struct {
-    enum CodecID id;
+    enum AVCodecID id;
     ff_asf_guid guid;
 } AVCodecGuid;
 
-enum CodecID ff_codec_guid_get_id(const AVCodecGuid *guids, ff_asf_guid guid);
+enum AVCodecID ff_codec_guid_get_id(const AVCodecGuid *guids, ff_asf_guid guid);
 
 extern const AVCodecGuid ff_codec_wav_guids[];
 

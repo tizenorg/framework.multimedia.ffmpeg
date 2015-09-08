@@ -130,7 +130,7 @@ typedef struct {
     void (*font_size)(void *priv, int size);
     void (*alignment)(void *priv, int alignment);
     void (*cancel_overrides)(void *priv, const char *style);
-    /**< @} */
+    /** @} */
 
     /**
      * @defgroup ass_functions    ASS functions
@@ -138,14 +138,14 @@ typedef struct {
      */
     void (*move)(void *priv, int x1, int y1, int x2, int y2, int t1, int t2);
     void (*origin)(void *priv, int x, int y);
-    /**< @} */
+    /** @} */
 
     /**
      * @defgroup ass_end    end of Dialogue Event
      * @{
      */
     void (*end)(void *priv);
-    /**< @} */
+    /** @} */
 } ASSCodesCallbacks;
 
 /**
@@ -167,6 +167,6 @@ int ff_ass_split_override_codes(const ASSCodesCallbacks *callbacks, void *priv,
  * @param style name of the style to search for.
  * @return the ASSStyle corresponding to style, or NULL if style can't be found
  */
-ASSStyle *ass_style_get(ASSSplitContext *ctx, const char *style);
+ASSStyle *ff_ass_style_get(ASSSplitContext *ctx, const char *style);
 
 #endif /* AVCODEC_ASS_SPLIT_H */

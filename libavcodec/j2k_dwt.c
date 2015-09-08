@@ -27,7 +27,7 @@
 
 #include "j2k_dwt.h"
 
-const static float scale97[] = {1.625786, 1.230174};
+static const float scale97[] = {1.625786, 1.230174};
 
 static inline void extend53(int *p, int i0, int i1)
 {
@@ -321,7 +321,7 @@ int ff_j2k_dwt_init(DWTContext *s, uint16_t border[2][2], int decomp_levels, int
     int i, j, lev = decomp_levels, maxlen,
         b[2][2];
 
-    if (decomp_levels >= FF_DWT_MAX_DECLVLS)
+    if ((unsigned)decomp_levels >= FF_DWT_MAX_DECLVLS)
         return AVERROR_INVALIDDATA;
     s->ndeclevels = decomp_levels;
     s->type = type;

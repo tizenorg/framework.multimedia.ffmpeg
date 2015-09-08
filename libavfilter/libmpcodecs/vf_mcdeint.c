@@ -92,7 +92,6 @@ struct vf_priv_s {
 
 static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int dst_stride[3], int src_stride[3], int width, int height){
     int x, y, i;
-    int out_size;
 
     for(i=0; i<3; i++){
         p->frame->data[i]= src[i];
@@ -102,7 +101,7 @@ static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int ds
     p->avctx_enc->me_cmp=
     p->avctx_enc->me_sub_cmp= FF_CMP_SAD /*| (p->parity ? FF_CMP_ODD : FF_CMP_EVEN)*/;
     p->frame->quality= p->qp*FF_QP2LAMBDA;
-    out_size = avcodec_encode_video(p->avctx_enc, p->outbuf, p->outbuf_size, p->frame);
+    avcodec_encode_video(p->avctx_enc, p->outbuf, p->outbuf_size, p->frame);
     p->frame_dec = p->avctx_enc->coded_frame;
 
     for(i=0; i<3; i++){
@@ -126,13 +125,13 @@ static void filter(struct vf_priv_s *p, uint8_t *dst[3], uint8_t *src[3], int ds
                         int temp= filp[0];
 
 #define CHECK(j)\
-    {   int score= ABS(srcp[-srcs-1+j] - srcp[+srcs-1-j])\
-                 + ABS(srcp[-srcs  +j] - srcp[+srcs  -j])\
-                 + ABS(srcp[-srcs+1+j] - srcp[+srcs+1-j]);\
+    {   int score= ABS(srcp[-srcs-1+(j)] - srcp[+srcs-1-(j)])\
+                 + ABS(srcp[-srcs  +(j)] - srcp[+srcs  -(j)])\
+                 + ABS(srcp[-srcs+1+(j)] - srcp[+srcs+1-(j)]);\
         if(score < spatial_score){\
             spatial_score= score;\
-            diff0= filp[-fils+j] - srcp[-srcs+j];\
-            diff1= filp[+fils-j] - srcp[+srcs-j];
+            diff0= filp[-fils+(j)] - srcp[-srcs+(j)];\
+            diff1= filp[+fils-(j)] - srcp[+srcs-(j)];
 
                         CHECK(-1) CHECK(-2) }} }}
                         CHECK( 1) CHECK( 2) }} }}
@@ -183,7 +182,7 @@ static int config(struct vf_instance *vf,
         int width, int height, int d_width, int d_height,
         unsigned int flags, unsigned int outfmt){
         int i;
-        AVCodec *enc= avcodec_find_encoder(CODEC_ID_SNOW);
+        AVCodec *enc= avcodec_find_encoder(AV_CODEC_ID_SNOW);
 
         for(i=0; i<3; i++){
             AVCodecContext *avctx_enc;

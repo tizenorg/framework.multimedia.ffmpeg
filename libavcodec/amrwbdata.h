@@ -82,7 +82,7 @@ typedef struct {
 } AMRWBFrame;
 
 /** The index of a frame parameter */
-#define AMR_BIT(field)                  (offsetof(AMRWBFrame, field) >> 1)
+#define AMR_BIT(field)                  (offsetof(AMRWBFrame, field))
 /** The index of a subframe-specific parameter */
 #define AMR_OF(frame_num, variable)     AMR_BIT(subframe[frame_num].variable)
 
@@ -1805,7 +1805,7 @@ static const float ir_filter_mid[64] = {
     -7.501221e-02,  2.920532e-02,  1.660156e-02,  7.751465e-02
 };
 
-static const float *ir_filters_lookup[2] = {
+static const float * const ir_filters_lookup[2] = {
     ir_filter_str, ir_filter_mid
 };
 

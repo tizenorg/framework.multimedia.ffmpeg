@@ -25,6 +25,11 @@
 #include "config.h"
 #include "attributes.h"
 
+/**
+ * @addtogroup lavu_internal
+ * @{
+ */
+
 extern const uint32_t ff_inverse[257];
 
 #if   ARCH_ARM
@@ -45,11 +50,7 @@ extern const uint32_t ff_inverse[257];
 #endif /* AV_GCC_VERSION_AT_LEAST(3,4) */
 
 #ifndef FASTDIV
-#   if CONFIG_FASTDIV
-#       define FASTDIV(a,b) ((uint32_t)((((uint64_t)a) * ff_inverse[b]) >> 32))
-#   else
-#       define FASTDIV(a,b) ((a) / (b))
-#   endif
+#   define FASTDIV(a,b) ((uint32_t)((((uint64_t)a) * ff_inverse[b]) >> 32))
 #endif /* FASTDIV */
 
 #include "common.h"
@@ -76,4 +77,7 @@ static inline av_const unsigned int ff_sqrt(unsigned int a)
     return b - (a < b * b);
 }
 
+/**
+ * @}
+ */
 #endif /* AVUTIL_INTMATH_H */

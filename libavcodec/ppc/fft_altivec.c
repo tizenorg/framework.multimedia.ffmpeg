@@ -19,9 +19,10 @@
  * License along with FFmpeg; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
+
+#include "libavutil/ppc/types_altivec.h"
+#include "libavutil/ppc/util_altivec.h"
 #include "libavcodec/fft.h"
-#include "util_altivec.h"
-#include "types_altivec.h"
 
 /**
  * Do a complex FFT with the parameters defined in ff_fft_init(). The
@@ -141,7 +142,9 @@ av_cold void ff_fft_init_altivec(FFTContext *s)
 {
 #if HAVE_GNU_AS
     s->fft_calc   = ff_fft_calc_interleave_altivec;
-    s->imdct_calc = ff_imdct_calc_altivec;
-    s->imdct_half = ff_imdct_half_altivec;
+    if (s->mdct_bits >= 5) {
+        s->imdct_calc = ff_imdct_calc_altivec;
+        s->imdct_half = ff_imdct_half_altivec;
+    }
 #endif
 }

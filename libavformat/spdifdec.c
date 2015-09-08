@@ -33,7 +33,7 @@
 static int spdif_get_offset_and_codec(AVFormatContext *s,
                                       enum IEC61937DataType data_type,
                                       const char *buf, int *offset,
-                                      enum CodecID *codec)
+                                      enum AVCodecID *codec)
 {
     AACADTSHeaderInfo aac_hdr;
     GetBitContext gbc;
@@ -41,53 +41,53 @@ static int spdif_get_offset_and_codec(AVFormatContext *s,
     switch (data_type & 0xff) {
     case IEC61937_AC3:
         *offset = AC3_FRAME_SIZE << 2;
-        *codec = CODEC_ID_AC3;
+        *codec = AV_CODEC_ID_AC3;
         break;
     case IEC61937_MPEG1_LAYER1:
         *offset = spdif_mpeg_pkt_offset[1][0];
-        *codec = CODEC_ID_MP1;
+        *codec = AV_CODEC_ID_MP1;
         break;
     case IEC61937_MPEG1_LAYER23:
         *offset = spdif_mpeg_pkt_offset[1][0];
-        *codec = CODEC_ID_MP3;
+        *codec = AV_CODEC_ID_MP3;
         break;
     case IEC61937_MPEG2_EXT:
         *offset = 4608;
-        *codec = CODEC_ID_MP3;
+        *codec = AV_CODEC_ID_MP3;
         break;
     case IEC61937_MPEG2_AAC:
         init_get_bits(&gbc, buf, AAC_ADTS_HEADER_SIZE * 8);
-        if (ff_aac_parse_header(&gbc, &aac_hdr)) {
+        if (avpriv_aac_parse_header(&gbc, &aac_hdr)) {
             if (s) /* be silent during a probe */
                 av_log(s, AV_LOG_ERROR, "Invalid AAC packet in IEC 61937\n");
             return AVERROR_INVALIDDATA;
         }
         *offset = aac_hdr.samples << 2;
-        *codec = CODEC_ID_AAC;
+        *codec = AV_CODEC_ID_AAC;
         break;
     case IEC61937_MPEG2_LAYER1_LSF:
         *offset = spdif_mpeg_pkt_offset[0][0];
-        *codec = CODEC_ID_MP1;
+        *codec = AV_CODEC_ID_MP1;
         break;
     case IEC61937_MPEG2_LAYER2_LSF:
         *offset = spdif_mpeg_pkt_offset[0][1];
-        *codec = CODEC_ID_MP2;
+        *codec = AV_CODEC_ID_MP2;
         break;
     case IEC61937_MPEG2_LAYER3_LSF:
         *offset = spdif_mpeg_pkt_offset[0][2];
-        *codec = CODEC_ID_MP3;
+        *codec = AV_CODEC_ID_MP3;
         break;
     case IEC61937_DTS1:
         *offset = 2048;
-        *codec = CODEC_ID_DTS;
+        *codec = AV_CODEC_ID_DTS;
         break;
     case IEC61937_DTS2:
         *offset = 4096;
-        *codec = CODEC_ID_DTS;
+        *codec = AV_CODEC_ID_DTS;
         break;
     case IEC61937_DTS3:
         *offset = 8192;
-        *codec = CODEC_ID_DTS;
+        *codec = AV_CODEC_ID_DTS;
         break;
     default:
         if (s) { /* be silent during a probe */
@@ -112,7 +112,7 @@ static int spdif_probe(AVProbeData *p)
     int sync_codes = 0;
     int consecutive_codes = 0;
     int offset;
-    enum CodecID codec;
+    enum AVCodecID codec;
 
     for (; buf < probe_end; buf++) {
         state = (state << 8) | *buf;
@@ -155,7 +155,7 @@ static int spdif_probe(AVProbeData *p)
     return AVPROBE_SCORE_MAX / 8;
 }
 
-static int spdif_read_header(AVFormatContext *s, AVFormatParameters *ap)
+static int spdif_read_header(AVFormatContext *s)
 {
     s->ctx_flags |= AVFMTCTX_NOHEADER;
     return 0;
@@ -165,7 +165,7 @@ static int spdif_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
     AVIOContext *pb = s->pb;
     enum IEC61937DataType data_type;
-    enum CodecID codec_id;
+    enum AVCodecID codec_id;
     uint32_t state = 0;
     int pkt_size_bits, offset, ret;
 
@@ -205,7 +205,7 @@ static int spdif_read_packet(AVFormatContext *s, AVPacket *pkt)
 
     if (!s->nb_streams) {
         /* first packet, create a stream */
-        AVStream *st = av_new_stream(s, 0);
+        AVStream *st = avformat_new_stream(s, NULL);
         if (!st) {
             av_free_packet(pkt);
             return AVERROR(ENOMEM);
@@ -226,11 +226,10 @@ static int spdif_read_packet(AVFormatContext *s, AVPacket *pkt)
 }
 
 AVInputFormat ff_spdif_demuxer = {
-    "spdif",
-    NULL_IF_CONFIG_SMALL("IEC 61937 (compressed data in S/PDIF)"),
-    0,
-    spdif_probe,
-    spdif_read_header,
-    spdif_read_packet,
-    .flags = AVFMT_GENERIC_INDEX,
+    .name           = "spdif",
+    .long_name      = NULL_IF_CONFIG_SMALL("IEC 61937 (compressed data in S/PDIF)"),
+    .read_probe     = spdif_probe,
+    .read_header    = spdif_read_header,
+    .read_packet    = spdif_read_packet,
+    .flags          = AVFMT_GENERIC_INDEX,
 };

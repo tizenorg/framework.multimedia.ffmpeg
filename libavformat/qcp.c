@@ -23,7 +23,7 @@
  * @file
  * QCP format (.qcp) demuxer
  * @author Kenan Gillet
- * @sa RFC 3625: "The QCP File Format and Media Types for Speech Data"
+ * @see RFC 3625: "The QCP File Format and Media Types for Speech Data"
  *     http://tools.ietf.org/html/rfc3625
  */
 
@@ -80,11 +80,11 @@ static int qcp_probe(AVProbeData *pd)
     return 0;
 }
 
-static int qcp_read_header(AVFormatContext *s, AVFormatParameters *ap)
+static int qcp_read_header(AVFormatContext *s)
 {
     AVIOContext *pb = s->pb;
     QCPContext    *c  = s->priv_data;
-    AVStream      *st = av_new_stream(s, 0);
+    AVStream      *st = avformat_new_stream(s, NULL);
     uint8_t       buf[16];
     int           i, nb_rates;
 
@@ -92,14 +92,13 @@ static int qcp_read_header(AVFormatContext *s, AVFormatParameters *ap)
         return AVERROR(ENOMEM);
 
     avio_rb32(pb);                    // "RIFF"
-    s->file_size = avio_rl32(pb) + 8;
-    avio_skip(pb, 8 + 4 + 1 + 1);    // "QLCMfmt " + chunk-size + major-version + minor-version
+    avio_skip(pb, 4 + 8 + 4 + 1 + 1);    // filesize + "QLCMfmt " + chunk-size + major-version + minor-version
 
     st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
     st->codec->channels   = 1;
     avio_read(pb, buf, 16);
     if (is_qcelp_13k_guid(buf)) {
-        st->codec->codec_id = CODEC_ID_QCELP;
+        st->codec->codec_id = AV_CODEC_ID_QCELP;
     } else if (!memcmp(buf, guid_evrc, 16)) {
         av_log(s, AV_LOG_ERROR, "EVRC codec is not supported.\n");
         return AVERROR_PATCHWELCOME;
@@ -189,7 +188,7 @@ static int qcp_read_packet(AVFormatContext *s, AVPacket *pkt)
 
 AVInputFormat ff_qcp_demuxer = {
     .name           = "qcp",
-    .long_name      = NULL_IF_CONFIG_SMALL("QCP format"),
+    .long_name      = NULL_IF_CONFIG_SMALL("QCP"),
     .priv_data_size = sizeof(QCPContext),
     .read_probe     = qcp_probe,
     .read_header    = qcp_read_header,

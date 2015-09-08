@@ -42,7 +42,7 @@ const int av_sha_size = sizeof(AVSHA);
 #define rol(value, bits) (((value) << (bits)) | ((value) >> (32 - (bits))))
 
 /* (R0+R1), R2, R3, R4 are the different operations used in SHA1 */
-#define blk0(i) (block[i] = av_be2ne32(((const uint32_t*)buffer)[i]))
+#define blk0(i) (block[i] = AV_RB32(buffer + 4 * (i)))
 #define blk(i)  (block[i] = rol(block[i-3] ^ block[i-8] ^ block[i-14] ^ block[i-16], 1))
 
 #define R0(v,w,x,y,z,i) z += ((w&(x^y))^y)     + blk0(i) + 0x5A827999 + rol(v, 5); w = rol(w, 30);
@@ -67,7 +67,7 @@ static void sha1_transform(uint32_t state[5], const uint8_t buffer[64])
     for (i = 0; i < 80; i++) {
         int t;
         if (i < 16)
-            t = av_be2ne32(((uint32_t*)buffer)[i]);
+            t = AV_RB32(buffer + 4 * i);
         else
             t = rol(block[i-3] ^ block[i-8] ^ block[i-14] ^ block[i-16], 1);
         block[i] = t;
@@ -181,7 +181,7 @@ static void sha256_transform(uint32_t *state, const uint8_t buffer[64])
 {
     unsigned int i, a, b, c, d, e, f, g, h;
     uint32_t block[64];
-    uint32_t T1, av_unused(T2);
+    uint32_t T1;
 
     a = state[0];
     b = state[1];
@@ -193,6 +193,7 @@ static void sha256_transform(uint32_t *state, const uint8_t buffer[64])
     h = state[7];
 #if CONFIG_SMALL
     for (i = 0; i < 64; i++) {
+        uint32_t T2;
         if (i < 16)
             T1 = blk0(i);
         else

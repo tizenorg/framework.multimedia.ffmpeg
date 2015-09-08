@@ -116,7 +116,9 @@ static inline av_const int mid_pred(int a, int b, int c)
 #ifndef sign_extend
 static inline av_const int sign_extend(int val, unsigned bits)
 {
-    return (val << ((8 * sizeof(int)) - bits)) >> ((8 * sizeof(int)) - bits);
+    unsigned shift = 8 * sizeof(int) - bits;
+    union { unsigned u; int s; } v = { (unsigned) val << shift };
+    return v.s >> shift;
 }
 #endif
 
@@ -134,6 +136,13 @@ if ((y) < (x)) {\
     (a) = (b);\
     (c) = (d);\
 }
+#endif
+
+#ifndef MASK_ABS
+#define MASK_ABS(mask, level) do {              \
+        mask  = level >> 31;                    \
+        level = (level ^ mask) - mask;          \
+    } while (0)
 #endif
 
 #ifndef NEG_SSR32
@@ -177,4 +186,3 @@ if ((y) < (x)) {\
 #endif
 
 #endif /* AVCODEC_MATHOPS_H */
-

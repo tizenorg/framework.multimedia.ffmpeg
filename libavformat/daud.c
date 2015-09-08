@@ -20,12 +20,12 @@
  */
 #include "avformat.h"
 
-static int daud_header(AVFormatContext *s, AVFormatParameters *ap) {
-    AVStream *st = av_new_stream(s, 0);
+static int daud_header(AVFormatContext *s) {
+    AVStream *st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
     st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
-    st->codec->codec_id = CODEC_ID_PCM_S24DAUD;
+    st->codec->codec_id = AV_CODEC_ID_PCM_S24DAUD;
     st->codec->codec_tag = MKTAG('d', 'a', 'u', 'd');
     st->codec->channels = 6;
     st->codec->sample_rate = 96000;
@@ -71,30 +71,23 @@ static int daud_write_packet(struct AVFormatContext *s, AVPacket *pkt)
 
 #if CONFIG_DAUD_DEMUXER
 AVInputFormat ff_daud_demuxer = {
-    "daud",
-    NULL_IF_CONFIG_SMALL("D-Cinema audio format"),
-    0,
-    NULL,
-    daud_header,
-    daud_packet,
-    NULL,
-    NULL,
-    .extensions = "302",
+    .name           = "daud",
+    .long_name      = NULL_IF_CONFIG_SMALL("D-Cinema audio"),
+    .read_header    = daud_header,
+    .read_packet    = daud_packet,
+    .extensions     = "302,daud",
 };
 #endif
 
 #if CONFIG_DAUD_MUXER
-AVOutputFormat ff_daud_muxer =
-{
-    "daud",
-    NULL_IF_CONFIG_SMALL("D-Cinema audio format"),
-    NULL,
-    "302",
-    0,
-    CODEC_ID_PCM_S24DAUD,
-    CODEC_ID_NONE,
-    daud_write_header,
-    daud_write_packet,
-    .flags= AVFMT_NOTIMESTAMPS,
+AVOutputFormat ff_daud_muxer = {
+    .name         = "daud",
+    .long_name    = NULL_IF_CONFIG_SMALL("D-Cinema audio"),
+    .extensions   = "302",
+    .audio_codec  = AV_CODEC_ID_PCM_S24DAUD,
+    .video_codec  = AV_CODEC_ID_NONE,
+    .write_header = daud_write_header,
+    .write_packet = daud_write_packet,
+    .flags        = AVFMT_NOTIMESTAMPS,
 };
 #endif

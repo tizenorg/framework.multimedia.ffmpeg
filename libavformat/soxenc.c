@@ -23,13 +23,14 @@
  */
 
 /**
- * SoX native format muxer
  * @file
+ * SoX native format muxer
  * @author Daniel Verkamp
- * @sa http://wiki.multimedia.cx/index.php?title=SoX_native_intermediate_format
+ * @see http://wiki.multimedia.cx/index.php?title=SoX_native_intermediate_format
  */
 
 #include "libavutil/intreadwrite.h"
+#include "libavutil/intfloat.h"
 #include "libavutil/dict.h"
 #include "avformat.h"
 #include "avio_internal.h"
@@ -54,18 +55,18 @@ static int sox_write_header(AVFormatContext *s)
 
     sox->header_size = SOX_FIXED_HDR + comment_size;
 
-    if (enc->codec_id == CODEC_ID_PCM_S32LE) {
+    if (enc->codec_id == AV_CODEC_ID_PCM_S32LE) {
         ffio_wfourcc(pb, ".SoX");
         avio_wl32(pb, sox->header_size);
         avio_wl64(pb, 0); /* number of samples */
-        avio_wl64(pb, av_dbl2int(enc->sample_rate));
+        avio_wl64(pb, av_double2int(enc->sample_rate));
         avio_wl32(pb, enc->channels);
         avio_wl32(pb, comment_size);
-    } else if (enc->codec_id == CODEC_ID_PCM_S32BE) {
+    } else if (enc->codec_id == AV_CODEC_ID_PCM_S32BE) {
         ffio_wfourcc(pb, "XoS.");
         avio_wb32(pb, sox->header_size);
         avio_wb64(pb, 0); /* number of samples */
-        avio_wb64(pb, av_dbl2int(enc->sample_rate));
+        avio_wb64(pb, av_double2int(enc->sample_rate));
         avio_wb32(pb, enc->channels);
         avio_wb32(pb, comment_size);
     } else {
@@ -102,7 +103,7 @@ static int sox_write_trailer(AVFormatContext *s)
         int64_t file_size = avio_tell(pb);
         int64_t num_samples = (file_size - sox->header_size - 4LL) >> 2LL;
         avio_seek(pb, 8, SEEK_SET);
-        if (enc->codec_id == CODEC_ID_PCM_S32LE) {
+        if (enc->codec_id == AV_CODEC_ID_PCM_S32LE) {
             avio_wl64(pb, num_samples);
         } else
             avio_wb64(pb, num_samples);
@@ -115,14 +116,13 @@ static int sox_write_trailer(AVFormatContext *s)
 }
 
 AVOutputFormat ff_sox_muxer = {
-    "sox",
-    NULL_IF_CONFIG_SMALL("SoX native format"),
-    NULL,
-    "sox",
-    sizeof(SoXContext),
-    CODEC_ID_PCM_S32LE,
-    CODEC_ID_NONE,
-    sox_write_header,
-    sox_write_packet,
-    sox_write_trailer,
+    .name              = "sox",
+    .long_name         = NULL_IF_CONFIG_SMALL("SoX native"),
+    .extensions        = "sox",
+    .priv_data_size    = sizeof(SoXContext),
+    .audio_codec       = AV_CODEC_ID_PCM_S32LE,
+    .video_codec       = AV_CODEC_ID_NONE,
+    .write_header      = sox_write_header,
+    .write_packet      = sox_write_packet,
+    .write_trailer     = sox_write_trailer,
 };

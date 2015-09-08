@@ -20,6 +20,7 @@
 
 #include "libavcodec/bytestream.h"
 #include "avformat.h"
+#include "internal.h"
 #include "oggdec.h"
 
 static int skeleton_header(AVFormatContext *s, int idx)
@@ -29,7 +30,8 @@ static int skeleton_header(AVFormatContext *s, int idx)
     AVStream *st = s->streams[idx];
     uint8_t *buf = os->buf + os->pstart;
     int version_major, version_minor;
-    int64_t start_num, start_den, start_granule;
+    int64_t start_num, start_den;
+    uint64_t start_granule;
     int target_idx, start_time;
 
     strcpy(st->codec->codec_name, "skeleton");
@@ -45,7 +47,7 @@ static int skeleton_header(AVFormatContext *s, int idx)
         version_major = AV_RL16(buf+8);
         version_minor = AV_RL16(buf+10);
 
-        if (version_major != 3) {
+        if (version_major != 3 && version_major != 4) {
             av_log(s, AV_LOG_WARNING, "Unknown skeleton version %d.%d\n",
                    version_major, version_minor);
             return -1;
@@ -62,7 +64,7 @@ static int skeleton_header(AVFormatContext *s, int idx)
         if (start_den) {
             int base_den;
             av_reduce(&start_time, &base_den, start_num, start_den, INT_MAX);
-            av_set_pts_info(st, 64, 1, base_den);
+            avpriv_set_pts_info(st, 64, 1, base_den);
             os->lastpts =
             st->start_time = start_time;
         }
@@ -72,9 +74,13 @@ static int skeleton_header(AVFormatContext *s, int idx)
 
         target_idx = ogg_find_stream(ogg, AV_RL32(buf+12));
         start_granule = AV_RL64(buf+36);
-        if (target_idx >= 0 && start_granule != -1) {
-            ogg->streams[target_idx].lastpts =
-            s->streams[target_idx]->start_time = ogg_gptopts(s, target_idx, start_granule, NULL);
+        if (os->start_granule != OGG_NOGRANULE_VALUE) {
+            av_log_missing_feature(s, "multiple fisbone for the "
+                                      "same stream\n", 0);
+            return 1;
+        }
+        if (target_idx >= 0 && start_granule != OGG_NOGRANULE_VALUE) {
+            os->start_granule = start_granule;
         }
     }
 
@@ -85,4 +91,5 @@ const struct ogg_codec ff_skeleton_codec = {
     .magic = "fishead",
     .magicsize = 8,
     .header = skeleton_header,
+    .nb_header = 0,
 };

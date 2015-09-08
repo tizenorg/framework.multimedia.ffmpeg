@@ -30,14 +30,15 @@
  * Note that this decoder reads big endian RGB555 pixel values from the
  * bytestream, arranges them in the host's endian order, and outputs
  * them to the final rendered map in the same host endian order. This is
- * intended behavior as the ffmpeg documentation states that RGB555 pixels
- * shall be stored in native CPU endianness.
+ * intended behavior as the libavcodec documentation states that RGB555
+ * pixels shall be stored in native CPU endianness.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "libavutil/internal.h"
 #include "libavutil/intreadwrite.h"
 #include "avcodec.h"
 
@@ -183,6 +184,8 @@ static void rpza_decode_stream(RpzaContext *s)
             color4[1] |= ((11 * ta + 21 * tb) >> 5);
             color4[2] |= ((21 * ta + 11 * tb) >> 5);
 
+            if (s->size - stream_ptr < n_blocks * 4)
+                return;
             while (n_blocks--) {
                 block_ptr = row_ptr + pixel_ptr;
                 for (pixel_y = 0; pixel_y < 4; pixel_y++) {
@@ -200,6 +203,8 @@ static void rpza_decode_stream(RpzaContext *s)
 
         /* Fill block with 16 colors */
         case 0x00:
+            if (s->size - stream_ptr < 16)
+                return;
             block_ptr = row_ptr + pixel_ptr;
             for (pixel_y = 0; pixel_y < 4; pixel_y++) {
                 for (pixel_x = 0; pixel_x < 4; pixel_x++){
@@ -250,7 +255,7 @@ static int rpza_decode_frame(AVCodecContext *avctx,
     s->buf = buf;
     s->size = buf_size;
 
-    s->frame.reference = 1;
+    s->frame.reference = 3;
     s->frame.buffer_hints = FF_BUFFER_HINTS_VALID | FF_BUFFER_HINTS_PRESERVE | FF_BUFFER_HINTS_REUSABLE;
     if (avctx->reget_buffer(avctx, &s->frame)) {
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
@@ -277,14 +282,13 @@ static av_cold int rpza_decode_end(AVCodecContext *avctx)
 }
 
 AVCodec ff_rpza_decoder = {
-    "rpza",
-    AVMEDIA_TYPE_VIDEO,
-    CODEC_ID_RPZA,
-    sizeof(RpzaContext),
-    rpza_decode_init,
-    NULL,
-    rpza_decode_end,
-    rpza_decode_frame,
-    CODEC_CAP_DR1,
-    .long_name = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
+    .name           = "rpza",
+    .type           = AVMEDIA_TYPE_VIDEO,
+    .id             = AV_CODEC_ID_RPZA,
+    .priv_data_size = sizeof(RpzaContext),
+    .init           = rpza_decode_init,
+    .close          = rpza_decode_end,
+    .decode         = rpza_decode_frame,
+    .capabilities   = CODEC_CAP_DR1,
+    .long_name      = NULL_IF_CONFIG_SMALL("QuickTime video (RPZA)"),
 };

@@ -70,6 +70,7 @@
 
 #include "libavutil/intreadwrite.h"
 #include "avformat.h"
+#include "internal.h"
 
 #define HUFFMAN_TABLE_SIZE (64 * 1024)
 #define IDCIN_FPS 14
@@ -137,8 +138,7 @@ static int idcin_probe(AVProbeData *p)
     return AVPROBE_SCORE_MAX / 2;
 }
 
-static int idcin_read_header(AVFormatContext *s,
-                             AVFormatParameters *ap)
+static int idcin_read_header(AVFormatContext *s)
 {
     AVIOContext *pb = s->pb;
     IdcinDemuxContext *idcin = s->priv_data;
@@ -153,13 +153,13 @@ static int idcin_read_header(AVFormatContext *s,
     bytes_per_sample = avio_rl32(pb);
     channels = avio_rl32(pb);
 
-    st = av_new_stream(s, 0);
+    st = avformat_new_stream(s, NULL);
     if (!st)
         return AVERROR(ENOMEM);
-    av_set_pts_info(st, 33, 1, IDCIN_FPS);
+    avpriv_set_pts_info(st, 33, 1, IDCIN_FPS);
     idcin->video_stream_index = st->index;
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id = CODEC_ID_IDCIN;
+    st->codec->codec_id = AV_CODEC_ID_IDCIN;
     st->codec->codec_tag = 0;  /* no fourcc */
     st->codec->width = width;
     st->codec->height = height;
@@ -174,10 +174,10 @@ static int idcin_read_header(AVFormatContext *s,
     /* if sample rate is 0, assume no audio */
     if (sample_rate) {
         idcin->audio_present = 1;
-        st = av_new_stream(s, 0);
+        st = avformat_new_stream(s, NULL);
         if (!st)
             return AVERROR(ENOMEM);
-        av_set_pts_info(st, 33, 1, IDCIN_FPS);
+        avpriv_set_pts_info(st, 33, 1, IDCIN_FPS);
         idcin->audio_stream_index = st->index;
         st->codec->codec_type = AVMEDIA_TYPE_AUDIO;
         st->codec->codec_tag = 1;
@@ -187,9 +187,9 @@ static int idcin_read_header(AVFormatContext *s,
         st->codec->bit_rate = sample_rate * bytes_per_sample * 8 * channels;
         st->codec->block_align = bytes_per_sample * channels;
         if (bytes_per_sample == 1)
-            st->codec->codec_id = CODEC_ID_PCM_U8;
+            st->codec->codec_id = AV_CODEC_ID_PCM_U8;
         else
-            st->codec->codec_id = CODEC_ID_PCM_S16LE;
+            st->codec->codec_id = AV_CODEC_ID_PCM_S16LE;
 
         if (sample_rate % 14 != 0) {
             idcin->audio_chunk_size1 = (sample_rate / 14) *
@@ -247,7 +247,9 @@ static int idcin_read_packet(AVFormatContext *s,
                 r = palette_buffer[i * 3    ] << palette_scale;
                 g = palette_buffer[i * 3 + 1] << palette_scale;
                 b = palette_buffer[i * 3 + 2] << palette_scale;
-                palette[i] = (r << 16) | (g << 8) | (b);
+                palette[i] = (0xFFU << 24) | (r << 16) | (g << 8) | (b);
+                if (palette_scale == 2)
+                    palette[i] |= palette[i] >> 6 & 0x30303;
             }
         }
 
@@ -263,8 +265,8 @@ static int idcin_read_packet(AVFormatContext *s,
 
             pal = av_packet_new_side_data(pkt, AV_PKT_DATA_PALETTE,
                                           AVPALETTE_SIZE);
-            if (ret < 0)
-                return ret;
+            if (!pal)
+                return AVERROR(ENOMEM);
             memcpy(pal, palette, AVPALETTE_SIZE);
         }
         pkt->stream_index = idcin->video_stream_index;
@@ -292,10 +294,10 @@ static int idcin_read_packet(AVFormatContext *s,
 }
 
 AVInputFormat ff_idcin_demuxer = {
-    "idcin",
-    NULL_IF_CONFIG_SMALL("id Cinematic format"),
-    sizeof(IdcinDemuxContext),
-    idcin_probe,
-    idcin_read_header,
-    idcin_read_packet,
+    .name           = "idcin",
+    .long_name      = NULL_IF_CONFIG_SMALL("id Cinematic"),
+    .priv_data_size = sizeof(IdcinDemuxContext),
+    .read_probe     = idcin_probe,
+    .read_header    = idcin_read_header,
+    .read_packet    = idcin_read_packet,
 };
